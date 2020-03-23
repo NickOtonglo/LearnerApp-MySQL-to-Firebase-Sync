@@ -1,0 +1,21 @@
+{
+  "name": "learnerapp",
+  "version": "1.0.0",
+  "description": "LearnerApp M-Pesa MySQL to Firebase daemon.",
+  "main": "create_table.js",
+  "dependencies": {
+    "@rodrigogs/mysql-events": "^0.6.0",
+    "firebase": "^7.2.1",
+    "firebase-admin": "^8.6.1",
+    "mysql": "^2.17.1",
+    "mysql-events": "0.0.11",
+    "underscore": "^1.9.1",
+    "zongji": "^0.4.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nick Otonglo",
+  "license": "ISC"
+}

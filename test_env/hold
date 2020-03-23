@@ -1,0 +1,47 @@
+var userRef = ref.child('Users').orderByChild('phone').equalTo('+'+event.affectedRows[0].after.MSISDN);
+userRef.once('value',function(snapshot){
+    const data = snapshot.val() || null;
+    if (data) {
+        let uid = Object.keys(data)[0];
+        
+        var emailRef = ref.child('Users').child(uid);
+        emailRef.once('value',function(snapshot){
+            let email = snapshot.val().email;
+            console.log(email);
+            var accountRef = ref.child('MonetaryAccount/'+uid);
+            accountRef.once('value',function(snapshot){
+                if(!snapshot.exists || !snapshot.hasChild('current_balance')){
+                    accountRef.set({
+                        "current_balance": 0,
+                        "email": email,
+                        "previous_balance": 0,
+                        "status": "enabled"
+                    });
+                }
+                let oldBal = parseFloat(snapshot.val().current_balance);
+                let amt = parseFloat((event.affectedRows[0].after.TransAmount)/exchangeRate+oldBal).toFixed(2);
+                let newBal = amt;
+                // ref.child('MonetaryAccount/'+uid).update({
+                //     "previous_balance": oldBal,
+                //     "current_balance": newBal
+                // });
+                console.log(oldBal+' '+newBal);
+                
+                var transactionRef = ref.child('TokenPurchase/'+uid);
+                // transactionRef.push({
+                //     "BalanceNew": newBal,
+                //     "BalancePrevious": oldBal,
+                //     "PaymentMethod": paymentMethod,
+                //     "AccountNumber": '+'+newRow.fields.MSISDN,
+                //     "Time": timeStamp(),
+                //     "TokensPurchased": parseFloat((newRow.fields.TransAmount)/exchangeRate).toFixed(2),
+                //     "TokensValue": parseFloat(newRow.fields.TransAmount).toFixed(2),
+                //     "User": uid,
+                //     "RefNumber":"12345",
+                //     "ExchangeRate":parseFloat(exchangeRate).toFixed(2)
+                // });
+                console.log("transaction complete");
+            });
+        });
+    }
+});
