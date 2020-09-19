@@ -1,1 +1,0 @@
-$env:GOOGLE_APPLICATION_CREDENTIALS="location-to-project\learnerapp\service-account.json"
