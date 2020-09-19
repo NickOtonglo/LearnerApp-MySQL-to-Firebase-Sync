@@ -1,6 +1,5 @@
 const MySQLEvents = require('@rodrigogs/mysql-events');
 var admin = require('firebase-admin');
-// $env:GOOGLE_APPLICATION_CREDENTIALS="C:\wamp64\www\learnerapp\service-account.json"
 let exchangeRate,exchangeRateIrators;
 let paymentMethod = "M-Pesa";
 let pool = require('./db_conn')
@@ -8,21 +7,20 @@ let separator = "---------------------------------------------------------------
 
 admin.initializeApp({
     credential: admin.credential.cert({
-        projectId: "learnerapp0001",
-        clientEmail: "firebase-adminsdk-ktfuw@learnerapp0001.iam.gserviceaccount.com",
-        privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCtWVkRywNxxsYY\nRftNSzwygqpLqhZOogWA3783VyHqRusojUl3qmKN6IANFedl9AvvSCD1RTisUWhc\n0iRPhC488W5Whqi6WyFx5HlQrellk5sBXRbdlq3JL2C2FPcJKgF3zFh/5dvOTDb3\nJYl0DPmRLKipRhs1wtd0Kq1vrfqK7/sFHY7E13RnEkC63LLIAxnfT7IiVdb+/9mK\n69OjBHLpuehNEozfG0BLF0RBErm9KM+uPCPzlw7cJ+iPlU4S4DIH2IJBpZx3yZiT\nPUPlI/deQD34Qfi0Z1K0YBJcK8t7zWTgTzIQ9ddou0HwUe5w+BP9DppK55FYzYK3\nEMWShSAjAgMBAAECggEAETfOMoe9JFhvhaqxztgZtxSmcJSI2a+bJ1VSC1+itT/t\nDJ6X/QRV/K1qxqH11XkblF1QNLx26Bq/6HRQ+frxkskSQhLnAHebx1G/wQU9KQMz\nwrtp0YGtak3D5+IGNYlQEwOfiLiekAue7AZ09CtzwHk0mXemrTzYpKe2iWC5AYKx\nxw5A86Ql1n1ay9frk5B3AvgOVCMQGNIgS0o892289/2hkGLQrp00bs2IBh032LVH\nclmKYKIOK7LCarb7ukTBNuW4Luh8ZjrEooYSQuXVpX0G3Y4ZXEGhwP0jDbhD181D\nCDFioXHZE/6EUaDvDYxovP5cvEVxTqfL6zceEl4xmQKBgQDaF4l2GThB3OWX6mTs\nnHphyO2dZFnoiZo9358CSyxaK4HXUX7LFTydr/o1ZRAIeUhKVsfr4rPNtz7X4vsY\nx8JTlo+fAVukN+I8xihCxAoP6a3PeasSvpYOAifOH/1e78IM/UVMhbd7Zcs6K71O\nMlVdfw0zJj+IdK2DxkM5iWvvawKBgQDLeuEyagUxc+1o/424x58xCmfFkaqsI0/5\nQFlBM98UzSPFeVSYTRvYlQTrActcV1HB3GtmmlGsUgBwym+ZeCqmoZ7Qd6enj8A7\nwfbKOtZHhNOzZHU80eR1p1miSqQlt1vpVw6VYdpFXYEYiQJ6qxToV9qtI+b0fwLF\n21k5yI1YKQKBgCcce3ljcnRVUhNZZLoOIeBxcTN9sKYEL1YTSWfW5WBSVxmvMsbm\nyxUYXw2+Tw7F+VHjmDzUThyBVVLQEOnTwSTOZnlEfBPKNddiTgwTLh7GcHY5wpU8\n+poOhubvU7f31VwQ+6GKhWoqyjRnba6dVjPLOinHHTOygP+Vya6C14l7AoGBAKjl\nQBNWiST5MrCanoont+0+08/cDyx+yxz62psScTKU7AI3qY4ZQunNF53xiVkGaahe\nSw+JPA2qqw70GRnr8osJUAd9qj2dRlTTtQM7Py1yBT68PcvT9Kvr0qyxA/sCbVoL\nluFLrZ8x87vnzZUAeIQ6mBpq2INNAYI1haQ+4YOxAoGAOrCvHlzUNVzQtcIniR/M\n0307aCQCHvyqUcVXyDl3wTB0FAFpuN6pBQB/CZEmfrKny+ymMg1PoNPHEV3/I2/F\nZIokIozUnHAmDxDiYsGrv9YDdVo2YqSt2OzEQ2rBD8Ameh7iikNdyNi3v9PBb9nu\nsyzjPayL381+uZjU21LIVRY=\n-----END PRIVATE KEY-----\n"
+        projectId: "learnerapp-45257",
+        clientEmail: "learnerapp-45257@appspot.gserviceaccount.com",
+        privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDOblQnhYJGJ/4J\nwJ9E8RriC12HlZZxLbGtnt/Ie4yPuVT8YcHFCNnmSPBmyKIFotwQSlRB+Jmjqi/G\nctHrLoU6Iuf7bHPKVfUHrBrYjqPzhXKAxm4T2Ov9t33485kfFxVKVSg8tiAvqjGt\nDcWQS3CZXxn9se+lIlvEXDCkBcKI3NusvT3syN0M0PlZRsMYLbq8ojE6Gtpz16hT\nJuDwa4fPp0TpV62in72fxgl1Gmz9iutO55fCoZ0tXIkiBzC18OC1T9CJ9sNCvSWe\nBAhTxKSwRZdcRmr8cgtqyx/2qTfrVcHuW4BHGfL7N2So0rQkW22iTY+1VHCkvk6A\nHKVFbcgZAgMBAAECggEAKShJIgoV47v0g+hCOQIjPH9MmgxCjvUv0DB1aKjtaPho\nD9vDwO+XVjkjqTKGTz5dxuey7eZNZ5q2ZMgev1eqm2E7RF8mpOhHbsyrG5Mw8Awi\nvLcTWmStBIxxktGqrU6yYXwiBhy/xREXT2wIAFFyNToHWhQAdjmn9zn0PrehRhz6\nvY5k3zEkM4WYyD4l5vxlHa6Bife01Gx9L67hvhnCfJr5swA9yHUXKkjVv5HW5yuy\nOiCJlBiKVochL9IY32ZOe5f4NZcgKY88wnmy5kWlD4b1IY4MN4oDENfj50+Da4zH\noZSLDLRc4gT6lwE56i8oh5JFkLsjn+aFc3L8oG4xIwKBgQD5REjcHhSQTShrhUx6\n3OP15p8oX285E7ldobyDJIbZ70L/6lJQZEZ2DXvhy/VXVJwMAVylS0MxylIyhyxT\npYZkniyNQHffFFyWiw/1v+C2Z4THQmqNGcS4rFiJgwybdRRZDDu+THpTRfpwLRAU\nuWPFbLAmYM51tiW8bXrNiGCapwKBgQDUAdQhR3q9hv4Evs9N15QFWenGrDF1RWh3\nGtvYX+vWoXZvaduWnXYEzdb983c5l3H5h8ZqNePGOWhnzsc3+zQ6DCNBxHz8ZzS8\nJDcAaBdkh2ODJJ8HKg5rZ0YCyDjI9E6ceNUwDWJ5qZVhuq8PxToKaQdGTKm1jj/A\ntlrM4tafPwKBgGLVKVJldt/UR/+BxdY9OQGp5Fc8p7vozymJ1FXnKLTGgjk4LlUD\nvVBXflQD644p1QmJjLNZSRY30ymHoRK1YbkJYj7LXfwMdb2W+8gDwVRxbRsYgWja\n274hT6WOWXRWErBQAmwspJ/Z8jeCFosxCpcfxiQhZBsWEpZIjlVqCmunAoGAJP6c\nsaHzfRcNRG63ZfH0Vmq2LIDnsHsIG6CINF2ona9XJ2Hle4bGjVgN6AqQB3Cx5sUW\njnoQ4QoredHPWalwF6D+lf9ff/vSa/I11tBTJKurZbsCNRHVqlA/G0UtA4P+I7fC\nG7x6Lpi1BHS7D5lu41oods/x3UiRP2OSvKXopakCgYEA9sluBlyqUrz2GRTspuxT\nVJUwUP79xcNpyeJ8BcarqSOAaPkiPS5f+lY15pawaj0wDBWAqIo5rtq69GKY0/Ps\nMbzLhmcAUR4RGUz49Amv+ySWANwqpfSjMjxSbpt8tV5C9gclb5bXDsqzuixYENNc\ndCglmYqzILwt9t5zeFFmYIA=\n-----END PRIVATE KEY-----\n"
       }),
-//   databaseURL: "https://learnerapp-45257.firebaseio.com/"
-    databaseURL: "https://learnerapp0001.firebaseio.com/"
+    databaseURL: "https://learnerapp-45257.firebaseio.com/"
 });
 
 var iratorsAdmin = admin.initializeApp({
     credential: admin.credential.cert({
-        projectId: "iratorsapp0001",
-        clientEmail: "firebase-adminsdk-yws4w@iratorsapp0001.iam.gserviceaccount.com",
-        privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC3ZonQ+T9btwEL\nA9nprCiIOT8nsL40pteZumf4wDWjpiZ7epN7bqADZeRk9WZrVQmOEofSoN/kha1s\nxCdntoZQBf+d8s3lbvaREcb438zXmM+w88Gf01jid9/XFCPxGifV23zwlfU6+F5S\nCzoeqciXaqOIEW6Jc+dNgDoX3OK3YH9O5Sh0AyQobS8IRxGddaIQS0vyDl3EFceB\nGBG8FpHsT0JS5L/m4cPdTC7jqCqX94MWH0QQidyQKEdc2udx4vIgMqr1ChVcOKi5\nrgmc+KlDztSQRXT3cjKGKzUcgtaCE3ISobp2sApERjSdbdh5s1Sl2jbvW3NP8DVA\nLIKpfzDfAgMBAAECggEAHL48xjFyDRk1gs5D4PFNhEADQQtcXAXJT3tdSn6Gnuhu\nKoxaQI46FMjreSkpYpP4GeSXQIWxtpp+xMefQgwN/neviUfMSMjRwDMFjewL/2l1\nz3lRyg8xDy6TYx1xyUUnThyGocbBdtBbKUeU1ckX5NHejEzobTFq5FoUK2OVGAEL\nMvA1ae2Y/RrBgC0REoRkHfMQ6Dh3Nq8eXDnLfBBF2d43Zp0aQAwZhuoRmWRtub9W\nHB4OiRy2yDZjPf4Ul111VqXgcN2g+jqegO3YQAwab+lLxYyKKkIzCJvj66EDf7s+\nYMLxnjcAEOIYM2n15PtB8e9v1Uqk2OnyixpGYmCVpQKBgQDdvMKn41NaJFe3esv/\nuz/TcttfsfYxg5UE9ZdIOcsFIvqKEzwFqLcSXgmqUqeYtlZLlL+hOtbzCbuY8ckN\nPorvjOXmyRxwJ4dDNkXQB3+70BXNNpIlz5HXa+ncplq5ZrYnnF7M76kjphUClXfD\nR3BEPxYyZHnHyLhJC+lr0hIepQKBgQDTvUsQ1t1NfFp1Y95DAcxctzRGT44B7VKl\nIDi3yHqvAggb0hi9cA1Rgn5RnkgtmU6BZfYP2UcPTbnn3xI0Dr7gDpTukvAjM26P\nkUO7RWHec5WC63pl3M7qBblL4Od+oyMD99JRxcVBkawOkFeWLzJYkIENZsicCEF+\nnqjRQxDeMwKBgQDD4Mn8UZ8CVHSAiyPG5308p4wPf0BDAUAVP3bCwPsNsJaufstZ\nHG+M9DGJmrae+wREhES8gyP7Uq+8LmszHfrSHx/Avgw3L1QYFcuaN+Wo3etEe16j\ntDfbm2LeHr6qZYeoekRsuZIrAb4xqCRCB8uvHiPXpFbIHBJfxPwQ2WRUWQKBgGsq\nuZ2SQnv/XoFfxJTBij+68hhMF6HeDiBJSKusKnv9WUFLev4Wgocotup0ZC/AEj3n\n7zxiSlbyjg9PlhUHCZC5kKOXdzc5xtGfQlq8aSZ/9cJHkLGRqqBDuV8wO7qasxRF\nEAwXPxlKs3zDjbETvjWZHdg8l3hxrUR65RLVEOqFAoGBAJkkFZcZn92mj94sOMJM\n+LSMWIvP+PQUyEIbAN1Ko9O68sfOCUujbPP+/EM/Nim02W7QglA0PsewnxrkXEuP\nQ60vvRHjzchOeMLC3wAIx0CbIDs/cAfhGyVNryYnQysFZribZwmX88RDrm+LD9OB\nnGkHoakFeCblQIBw23weuQIo\n-----END PRIVATE KEY-----\n"
+        projectId: "iratorsapp",
+        clientEmail: "firebase-adminsdk-6qih9@iratorsapp.iam.gserviceaccount.com",
+        privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDfDFkgEgskpMr2\n6CR2B7sww2R80KGJuQLwuB/PhQ3z67W7UR1cHxHNblbPxowVVbEsMwhF1NEbG/2+\nXDdBzbGkXvw+oLDhhxtiEw2WTOsNmsIlYs9w+Ucg9ngIdA0S0/dw9IOFeSCsHZ/5\n/oWHDkV7H4ZwG5yQq6JNpp3JO5Lee49L8IvXyi22JNJkMvsYrBO1oiXV6kRMcUuC\nRBeOhzzczdSrgy8w3TXNxFoYImRxwDqsufL2M7pO2zKmSzL9wAAZtvZ77RdxC0Yt\n1+pEiVqfqocR/Lu3wIw2iAy4wFQ31ltk9tw+IhNEbgabQKHQwjNU/u1M0sFMeO4B\nCyWcrAirAgMBAAECggEAGXswp2BIU5xb748fszg4414/GZ9ABRrUwilWwP9jU61m\n6opev0pxXzWuxzfYgwtyHSmLVWb1qJIvD9M7INJd6/hJ+uGis3Ea6L5ie/w3kitO\n6LR8HFzuCk798YFIiREcIJRefh4TZHZR815nZMF1oJY+ZopQ/ZoOBa72MaoTokTm\nxSMSyMwV6rRAzn+6FxSssWjsvQwNn7/cB34OjkORRr2vIzXFMeOJcAT1Yygn71Ow\ntanguJ914DrPMy1vNbLO2uHnWx5CfVfhSCMfe1RhR8tAkfPsSWEax2mDa8+s07Ak\nlxPKRpR6492/wHofFIJrKztBz7lNNIosIyUGA0QpAQKBgQDxZlanuNb6aePX8iUX\nCQt7pNQqvGds5sqX5pHYeAX3lCncpDyJ3uiJpfAcs+Le8Bva93VdEP65eM8lx1x/\nlaTx1QddXFF8opffRbL7xip5wTmJW8bmVRgPTQf39TqLsO7fd1Hct5Y1Dq/6/jtF\nVAf6YbGvav5n7It/RZc7zb10KwKBgQDsid4kaEwt5xJ1ep5M3jFfitnf86IAiZry\naHBJijVg+B5Hqqa/UXO4lSnYG/JG/F9E9RXdgv/rVu4DtSlcsI8nplkmrhn+dQ8G\ne6vnIHLB8+4oYIp8eWrDz1U+VLN6HGUzZfSNYMWabajb6C48kF8B8kuq2sgt0Zre\nU3e0DDL9gQKBgHOrkPw/IqvND4MLIWCfUeRGP+/WZUyWbh9JOTtbj6hpU4HJJMT/\njbdfTuXCAITI0uAiURduLFBdJg05MQZlgyrp4+SFdvpcwp8Wu8PO2c2Lm/FIi88U\nmTnDtHzJAeurtVpYx14WjiAQUJzZMzduI4CDTWv7vbm4a8NpaiUa2ZwPAoGBAJeB\nQwj8yPaJz/fxXx2LIAK7VAwu5/ACM33ayTlBTilbI0HyGzXlvQJYgGHMnKU9FuR7\nOtMUCkm591/mlKSq7jaORQISd9HVNpeHdTboQLjcPgocs/dAadMbpNT0ubSYJXYD\nct1vQ4JDhOm90Ie4TTJY+IBp+9flLpYCzmRDgBGBAoGBAIY6+6crlTOpblwlBaNX\nCen5dU+U1QylpgnEcZ90UdBEJaseG2yEOfS/PaBG/mZaSti5NfhUlBZi3QIDU8KS\n0gbVkGCLZWSDnHJ3SVnutlmd9xO8VnnWedVh1qUNFeRk3tv+Zg5J91RnRmfDLjKx\nTcOMWhgBnEXwPXQMCse5MVpr\n-----END PRIVATE KEY-----\n"
       }),
-    databaseURL: "https://iratorsapp0001.firebaseio.com/"
+    databaseURL: "https://iratorsapp.firebaseio.com/"
 },'IratorsApp');
 
 var ref = admin.database().ref();
@@ -64,15 +62,14 @@ const program = async () => {
 
             var account = (event.affectedRows[0].after.BilRef);
             var appId = account.substring(0, 7);
-			var accPhone = account.substring(account.length-9, account.length);
             
             if (appId == 'irators'){
                 console.log(separator);
-                console.log("iratorsapp_transaction");
-                var userRef = refIrators.child('Users').orderByChild('phone').equalTo('+254'+accPhone);
+                console.log("iratorsapp_transaction")
+                var userRef = refIrators.child('Users').orderByChild('phone').equalTo('+'+event.affectedRows[0].after.MSISDN);
                 userRef.once('value',function(snapshot){
                     if (!snapshot.exists){
-                        console.log("phone number (BillRef) +254"+ accPhone +" does not exist in any user's account.");
+                        console.log("phone number (MSISDN) "+ event.affectedRows[0].after.MSISDN +" does not exist in any user's account.")
                     } else {
                         const data = snapshot.val() || null;
                         if (data) {
@@ -118,19 +115,16 @@ const program = async () => {
                                     console.log(separator);
                                 });
                             });
-                        } else {
-							console.log("[IF(DATA)] phone number (BillRef) +254"+ accPhone +" does not exist in any user's account.");
-							console.log(separator);
-						}
+                        }
                     }
                 });
             } else {
                 console.log(separator);
-                console.log("learnerapp_transaction");
-                var userRef = ref.child('Users').orderByChild('phone').equalTo('+254'+accPhone);
+                console.log("learnerapp_transaction")
+                var userRef = ref.child('Users').orderByChild('phone').equalTo('+'+event.affectedRows[0].after.MSISDN);
                 userRef.once('value',function(snapshot){
                     if (!snapshot.exists){
-                        console.log("phone number (BillRef) +254"+ accPhone +" does not exist in any user's account.");
+                        console.log("phone number (MSISDN) "+ event.affectedRows[0].after.MSISDN +" does not exist in any user's account.")
                     } else {
                         const data = snapshot.val() || null;
                         if (data) {
@@ -176,10 +170,7 @@ const program = async () => {
                                     console.log(separator);
                                 });
                             });
-                        } else {
-							console.log("[IF(DATA)] phone number (BillRef) +254"+ accPhone +" does not exist in any user's account.");
-							console.log(separator);
-						}
+                        }
                     }
                 });
             }
